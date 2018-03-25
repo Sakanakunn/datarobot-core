@@ -238,16 +238,23 @@ def add_prediction_scores(trained_pipeline_dict,X_score):
     predict_df = pd.DataFrame.from_dict(predict_dict)
     predict_df_conc = pd.concat([X_score, predict_df], axis=1)
     predict_df_conc.to_csv('output.csv')
+    convert_df_to_image(predict_df_conc, 'result.png', False)
+    pdb.set_trace()
+    return  predict_df_conc
+
+def convert_df_to_image(df,imagename,all_fl):
     dphtml = r'<link rel="stylesheet" type="text/css" href="./table.css" />' + '\n'
-    dphtml += predict_df_conc.head().to_html()
+    if all_fl:
+        dphtml += df.to_html()
+    else:
+        dphtml += df.head().to_html()
+
     with open('table.html', 'w') as f:
         f.write(dphtml)
         f.close()
         pass
     subprocess.call(
         'wkhtmltoimage -f png --width 0 table.html result_table.png', shell=True)
-    pdb.set_trace()
-    return  predict_df_conc
 
 ## TODO ベストモデルを選択する!
 ## TODO ベストモデルを保存する!
