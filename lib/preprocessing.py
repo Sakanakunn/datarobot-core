@@ -6,7 +6,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import auc
+from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score
 from sklearn.metrics import auc
 from sklearn.metrics import f1_score
 from sklearn import metrics
@@ -159,24 +160,32 @@ def split_holdout(X,y):
 def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     alg_names = []
     accuracy_scores = []
+    precision_scores = []
+    recall_scores = []
     roc_scores = []
     f1_scores = []
     result_dict = {}
     for key in trained_pipeline_dict.keys():
         alg_names.append(key)
         accuracy_scores.append(float(accuracy_score(y_test.as_matrix().ravel(),trained_pipeline_dict[key].predict(X_test))))
+        precision_scores.append(float(precision_score(y_test.as_matrix().ravel(), trained_pipeline_dict[key].predict(X_test))))
+        recall_scores.append(float(recall_score(y_test.as_matrix().ravel(), trained_pipeline_dict[key].predict(X_test))))
         f1_scores.append(float(f1_score(y_test.as_matrix().ravel(), trained_pipeline_dict[key].predict(X_test))))
         fpr, tpr, thresholds = metrics.roc_curve(y_test.as_matrix().ravel(), trained_pipeline_dict[key].predict(X_test))
         roc_scores.append(metrics.auc(fpr, tpr))
     result_dict['0_alg_name'] = alg_names
     result_dict['1_accuracy_score'] = accuracy_scores
-    result_dict['2_auc_score'] = roc_scores
-    result_dict['3_F1_score'] = f1_scores
+    result_dict['2_precision_score'] = precision_scores
+    result_dict['3_recall_score'] = recall_scores
+    result_dict['4_auc_score'] = roc_scores
+    result_dict['5_F1_score'] = f1_scores
     result_dict = pd.DataFrame.from_dict(result_dict)
+    result_dict.to_csv('out.csv')
     return result_dict
 
 ## TODO 途中で生成されたデータセットをExportする！
 ## TODO 評価指標を新たに追加する!
+#適合率(Precision) と　再現率(Recall)
 ## TODO 評価用の各種グラフをExportする!
 
 ## TODO ベストモデルを選択する!
