@@ -36,6 +36,8 @@ def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names,scor
     print(x_train_fin.head())
     print(x_train_fin.info())
     print("-------------------------------")
+    pre.convert_df_to_image(x_train_fin.head(15), './Figures/02_traindata_reshaped.png', False)
+    pre.convert_df_to_image(x_train_fin.describe(), './Figures/02_traindata_reshaped_desc.png', False)
 
     ## スコアリング用データの前処理
     ### データの読み込み
@@ -61,6 +63,8 @@ def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names,scor
     x_score_fin = x_score_ohe_inte_imp.loc[:,x_train_fin.columns.values]
 
     pre.x_check(x_train_fin,x_score_fin)
+    pre.convert_df_to_image(x_score_fin.head(15), './Figures/03_scoredata_reshaped.png', False)
+    pre.convert_df_to_image(x_score_fin.describe(), './Figures/03_scoredata_reshaped_desc.png', False)
 
     ## パイプラインの用意
     classifiers = [

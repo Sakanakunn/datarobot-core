@@ -29,6 +29,8 @@ plt.rc('font', **font)
 ## スコアリング用データのImport
 def train_read(CsvPath,score_column_name,Exclude_columns):
     df = pd.read_csv(CsvPath, header=0)
+    convert_df_to_image(df.head(15), './Figures/01_traindata.png', False)
+    convert_df_to_image(df.describe(), './Figures/01_traindata_desc.png', False)
     train_keys = ['X_train','y_train','all_train_columns','objects_train_columns','objects_dummy_train_columns','dtype_dict']
     if Exclude_columns != ['']:
         X_train = df.iloc[:, df.columns != score_column_name].drop(Exclude_columns, axis=1)
@@ -166,6 +168,10 @@ def train_pipeline_with_grid(pipeline_dict,X_train,y_train):
 
 def split_holdout(X,y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+    convert_df_to_image(X_train.head(15), './Figures/04_X_train_table.png', False)
+    convert_df_to_image(X_test.head(15), './Figures/04_X_test_table.png', False)
+    convert_df_to_image(X_train.describe(), './Figures/04_X_train_table_desc.png', False)
+    convert_df_to_image(X_test.describe(), './Figures/04_X_test_table_desc.png', False)
     return X_train,y_train,X_test,y_test
 
 def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
@@ -191,10 +197,11 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     result_dict['4_auc_score'] = roc_scores
     result_dict['5_F1_score'] = f1_scores
     result_dict = pd.DataFrame.from_dict(result_dict)
-    result_dict.to_csv('result.csv')
+    result_dict.to_csv('./csvs/result.csv')
+    convert_df_to_image(result_dict, './figures/05_trainedscore_table.png', False)
     plot = result_dict.plot.barh(figsize=(15,10),subplots = True, x = '0_alg_name' ,layout = (2,3))
     fig = plot[0][0].get_figure()
-    fig.savefig("result_fig_0.png")
+    fig.savefig("./figures/05_trainedscore_graph.png")
 
     #変数の重要度を計算する
     val_imp = ExtraTreesClassifier()
@@ -208,10 +215,11 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     imp_dict = dict(zip(X_test.columns.values,val_imp_values))
     result_dict_imp = pd.DataFrame.from_dict(imp_dict)
     result_dict_imp_fin = result_dict_imp.T.rename(columns = {0:'Feature Importance'}).sort_values(by = 'Feature Importance', ascending = False)
-    result_dict_imp_fin.to_csv('imp.csv')
-    plot = result_dict_imp_fin.plot.bar(y="Feature Importance",figsize = (10,10))
+    result_dict_imp_fin.to_csv('./csvs/imp.csv')
+    plot = result_dict_imp_fin.plot.bar(y="Feature Importance",figsize = (10,8))
     fig = plot.get_figure()
-    fig.savefig("importance_fig.png")
+    convert_df_to_image(result_dict_imp_fin, './figures/06_feature_importance_table.png', False)
+    fig.savefig("./figures/06_feature_importance_graph.png")
 
     # Partial Dependence
     gb_model = GradientBoostingClassifier()
@@ -221,7 +229,7 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
                                        feature_names= result_dict_imp_fin.iloc[0:3,0].index.values,
                                        X=X_test,
                                        grid_resolution=5)
-    fig.savefig("pdp_plot.png")
+    fig.savefig("./figures/07_pdp_graph.png")
     return result_dict
 
 
@@ -237,17 +245,17 @@ def add_prediction_scores(trained_pipeline_dict,X_score):
     predict_dict = dict(zip(predict_scores_keys,predict_scores))
     predict_df = pd.DataFrame.from_dict(predict_dict)
     predict_df_conc = pd.concat([X_score, predict_df], axis=1)
-    predict_df_conc.to_csv('output.csv')
-    convert_df_to_image(predict_df_conc, 'result.png', False)
-    pdb.set_trace()
+    predict_df_conc.to_csv('./csvs/output.csv')
+    convert_df_to_image(predict_df_conc, './figures/08_scoreadd_table.png', False)
+    convert_df_to_image(predict_df_conc.describe(), './figures/08_scoreadd_graph.png', False)
     return  predict_df_conc
 
 def convert_df_to_image(df,imagename,all_fl):
-    dphtml = r'<link rel="stylesheet" type="text/css" href="./table.css" />' + '\n'
+    dphtml = r'<meta http-equiv="content-type" charset="utf-8">' + r'<link rel="stylesheet" type="text/css" href="./table.css" />' + '\n' + r'<p>あいうえお!</p>'
     if all_fl:
         dphtml += df.to_html()
     else:
-        dphtml += df.head().to_html()
+        dphtml += df.head(30).to_html()
 
     with open('table.html', 'w') as f:
         f.write(dphtml)
@@ -256,6 +264,6 @@ def convert_df_to_image(df,imagename,all_fl):
     subprocess.call(
         'wkhtmltoimage -f png --width 0 table.html '+ imagename, shell=True)
 
+## TODO 数値表記のカテゴリカルデータを追加で手動対応できるようにする
 ## TODO ベストモデルを選択する!
 ## TODO ベストモデルを保存する!
-## TODO 予測ラベルを評価用データセットに付与する！
