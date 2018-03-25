@@ -9,7 +9,7 @@ from sklearn.neural_network import MLPClassifier
 import xgboost as xgb
 import pdb
 
-def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names):
+def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names,score_data_path):
     ## 訓練データの前処理
     ### データの読み込み
     train_set = pre.train_read(train_data_path,score_column_name,exclude_columns_names)
@@ -90,6 +90,7 @@ def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names):
     trained_pipeline_dict = pre.train_pipeline_with_grid(pipelines_dict,X_train,y_train)
 
     result_dict = pre.Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test)
+    pre.add_prediction_scores(trained_pipeline_dict, x_score_fin)
     print(result_dict)
 
 if __name__ == '__main__':
@@ -104,4 +105,4 @@ if __name__ == '__main__':
     ## スコアリングデータのパス
     score_data_path =  './data/titanic/test.csv'
 
-    main(train_data_path,scoring_column_name,mapping_fl,exclude_columns_names)
+    main(train_data_path,scoring_column_name,mapping_fl,exclude_columns_names,score_data_path)

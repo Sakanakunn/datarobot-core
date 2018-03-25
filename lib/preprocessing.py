@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import xgboost as xgb
 import seaborn as sns
 import pdb
+from sklearn.metrics import roc_curve, auc
+import subprocess
 
 plt.style.use('ggplot')
 font = {'family' : 'meiryo'}
@@ -220,14 +222,32 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
                                        X=X_test,
                                        grid_resolution=5)
     fig.savefig("pdp_plot.png")
-    pdb.set_trace()
     return result_dict
 
-    # Partial Dependence
 
-## TODO 評価用の各種グラフをExportする!
-#変数の重要度 + PDP plot
-
+def add_prediction_scores(trained_pipeline_dict,X_score):
+    predict_scores = []
+    predict_scores_keys = ['Log_pred','RF_pred','GB_pred','Xgb_pred']
+    for key in trained_pipeline_dict.keys():
+        TF_prob = trained_pipeline_dict[key].predict_proba(X_score)
+        predict_scores_sub = []
+        for val in TF_prob:
+            predict_scores_sub.append(round(val[0],4))
+        predict_scores.append(predict_scores_sub)
+    predict_dict = dict(zip(predict_scores_keys,predict_scores))
+    predict_df = pd.DataFrame.from_dict(predict_dict)
+    predict_df_conc = pd.concat([X_score, predict_df], axis=1)
+    predict_df_conc.to_csv('output.csv')
+    dphtml = r'<link rel="stylesheet" type="text/css" href="./table.css" />' + '\n'
+    dphtml += predict_df_conc.head().to_html()
+    with open('table.html', 'w') as f:
+        f.write(dphtml)
+        f.close()
+        pass
+    subprocess.call(
+        'wkhtmltoimage -f png --width 0 table.html result_table.png', shell=True)
+    pdb.set_trace()
+    return  predict_df_conc
 
 ## TODO ベストモデルを選択する!
 ## TODO ベストモデルを保存する!
