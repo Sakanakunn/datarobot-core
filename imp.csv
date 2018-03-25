@@ -1,9 +1,9 @@
 ,Feature Importance
-Fare,0.27
-Age,0.22
-Sex_male,0.18
-Pclass,0.09
-Sex_female,0.09
+Fare,0.3
+Age,0.21
+Sex_female,0.15
+Sex_male,0.13
+Pclass,0.08
 SibSp,0.06
 Parch,0.05
 Embarked_C,0.02

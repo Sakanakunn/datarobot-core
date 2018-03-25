@@ -5,6 +5,7 @@ from sklearn.feature_selection import RFE
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble.partial_dependence import partial_dependence, plot_partial_dependence
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
@@ -142,7 +143,7 @@ def build_pipeline(classifiers,classifier_pipe_names):
 def train_pipeline_with_grid(pipeline_dict,X_train,y_train):
     # パラメータグリッドの設定
     grid_parameters = []
-    grid_parameters.append({'est__C': range(1,100,1), 'est__penalty': ['l1', 'l2']})
+    grid_parameters.append({'est__C': [1,50,100], 'est__penalty': ['l1', 'l2']})
     grid_parameters.append({'est__n_estimators':[1,50,100]
                             ,'est__criterion': ['gini','entropy']})
     grid_parameters.append({'est__n_estimators': [1,50,100]
@@ -190,7 +191,6 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     result_dict = pd.DataFrame.from_dict(result_dict)
     result_dict.to_csv('result.csv')
     plot = result_dict.plot.barh(figsize=(15,10),subplots = True, x = '0_alg_name' ,layout = (2,3))
-    pdb.set_trace()
     fig = plot[0][0].get_figure()
     fig.savefig("result_fig_0.png")
 
@@ -210,7 +210,20 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     plot = result_dict_imp_fin.plot.bar(y="Feature Importance",figsize = (10,10))
     fig = plot.get_figure()
     fig.savefig("importance_fig.png")
+
+    # Partial Dependence
+    gb_model = GradientBoostingClassifier()
+    gb_model.fit(X_test,y_test.as_matrix().ravel())
+    fig, axs = plot_partial_dependence(gb_model,
+                                       features = result_dict_imp_fin.iloc[0:3,0].index.values,
+                                       feature_names= result_dict_imp_fin.iloc[0:3,0].index.values,
+                                       X=X_test,
+                                       grid_resolution=5)
+    fig.savefig("pdp_plot.png")
+    pdb.set_trace()
     return result_dict
+
+    # Partial Dependence
 
 ## TODO 評価用の各種グラフをExportする!
 #変数の重要度 + PDP plot
