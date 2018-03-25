@@ -14,8 +14,14 @@ from sklearn.metrics import f1_score
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import ExtraTreesClassifier
+import matplotlib.pyplot as plt
 import xgboost as xgb
+import seaborn as sns
 import pdb
+
+plt.style.use('ggplot')
+font = {'family' : 'meiryo'}
+plt.rc('font', **font)
 
 ## スコアリング用データのImport
 def train_read(CsvPath,score_column_name,Exclude_columns):
@@ -183,6 +189,10 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     result_dict['5_F1_score'] = f1_scores
     result_dict = pd.DataFrame.from_dict(result_dict)
     result_dict.to_csv('result.csv')
+    plot = result_dict.plot.barh(figsize=(15,10),subplots = True, x = '0_alg_name' ,layout = (2,3))
+    pdb.set_trace()
+    fig = plot[0][0].get_figure()
+    fig.savefig("result_fig_0.png")
 
     #変数の重要度を計算する
     val_imp = ExtraTreesClassifier()
@@ -195,7 +205,11 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
 
     imp_dict = dict(zip(X_test.columns.values,val_imp_values))
     result_dict_imp = pd.DataFrame.from_dict(imp_dict)
-    result_dict_imp.T.rename(columns = {0:'Feature Importance'}).sort_values(by = 'Feature Importance', ascending = False).to_csv('imp.csv')
+    result_dict_imp_fin = result_dict_imp.T.rename(columns = {0:'Feature Importance'}).sort_values(by = 'Feature Importance', ascending = False)
+    result_dict_imp_fin.to_csv('imp.csv')
+    plot = result_dict_imp_fin.plot.bar(y="Feature Importance",figsize = (10,10))
+    fig = plot.get_figure()
+    fig.savefig("importance_fig.png")
     return result_dict
 
 ## TODO 評価用の各種グラフをExportする!

@@ -71,10 +71,10 @@ def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names):
     ]
 
     classifier_pipe_names =[
-        'Logistic_pipe'
-        ,'RandomForest_pipe'
-        ,'GradientBoost_pipe'
-        ,'XgbRegression'
+        'Log'
+        ,'RF'
+        ,'GB'
+        ,'Xgb'
     ]
 
     if mapping_fl != False:
