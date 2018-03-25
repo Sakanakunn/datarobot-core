@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import Imputer
 from sklearn.feature_selection import RFE
 from sklearn.ensemble import GradientBoostingClassifier
@@ -12,6 +13,7 @@ from sklearn.metrics import auc
 from sklearn.metrics import f1_score
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import ExtraTreesClassifier
 import xgboost as xgb
 import pdb
 
@@ -180,13 +182,25 @@ def Scoring_TrainedModel(trained_pipeline_dict,X_test,y_test):
     result_dict['4_auc_score'] = roc_scores
     result_dict['5_F1_score'] = f1_scores
     result_dict = pd.DataFrame.from_dict(result_dict)
-    result_dict.to_csv('out.csv')
+    result_dict.to_csv('result.csv')
+
+    #変数の重要度を計算する
+    val_imp = ExtraTreesClassifier()
+    val_imp.fit(X_test,y_test.as_matrix().ravel())
+    val_imp_values = []
+    for i in val_imp.feature_importances_:
+        array = []
+        array.append(round(i,2))
+        val_imp_values.append(array)
+
+    imp_dict = dict(zip(X_test.columns.values,val_imp_values))
+    result_dict_imp = pd.DataFrame.from_dict(imp_dict)
+    result_dict_imp.T.rename(columns = {0:'Feature Importance'}).sort_values(by = 'Feature Importance', ascending = False).to_csv('imp.csv')
     return result_dict
 
-## TODO 途中で生成されたデータセットをExportする！
-## TODO 評価指標を新たに追加する!
-#適合率(Precision) と　再現率(Recall)
 ## TODO 評価用の各種グラフをExportする!
+#変数の重要度 + PDP plot
+
 
 ## TODO ベストモデルを選択する!
 ## TODO ベストモデルを保存する!

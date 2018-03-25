@@ -100,7 +100,7 @@ if __name__ == '__main__':
     ## スコアリング列のカラム番号
     scoring_column_name = 'Survived'
     ## 除外するカラム名
-    exclude_columns_names = ['Ticket','Cabin','Name']
+    exclude_columns_names = ['Ticket','Cabin','Name','PassengerId']
     ## スコアリングデータのパス
     score_data_path =  './data/titanic/test.csv'
 
