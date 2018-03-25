@@ -254,7 +254,7 @@ def convert_df_to_image(df,imagename,all_fl):
         f.close()
         pass
     subprocess.call(
-        'wkhtmltoimage -f png --width 0 table.html result_table.png', shell=True)
+        'wkhtmltoimage -f png --width 0 table.html '+ imagename, shell=True)
 
 ## TODO ベストモデルを選択する!
 ## TODO ベストモデルを保存する!
