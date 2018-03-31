@@ -99,14 +99,14 @@ def main(train_data_path,score_column_name,mapping_fl,exclude_columns_names,scor
 
 if __name__ == '__main__':
     ## テストデータのパス
-    train_data_path = './data/titanic/train.csv'
+    train_data_path = './data/final/final_hr_analysis_train.csv'
     ##Class Mapping
     mapping_fl = False
     ## スコアリング列のカラム番号
-    scoring_column_name = 'Survived'
+    scoring_column_name = 'left'
     ## 除外するカラム名
-    exclude_columns_names = ['Ticket','Cabin','Name','PassengerId']
+    exclude_columns_names = ['index']
     ## スコアリングデータのパス
-    score_data_path =  './data/titanic/test.csv'
+    score_data_path =  './data/final/final_hr_analysis_test.csv'
 
     main(train_data_path,scoring_column_name,mapping_fl,exclude_columns_names,score_data_path)
