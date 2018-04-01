@@ -1,5 +1,11 @@
 ,Feature Importance
-petal_length,0.42
-petal_width,0.38
-sepal_length,0.12
-sepal_width,0.08
+Fare,0.28
+Age,0.22
+Sex_female,0.18
+Sex_male,0.1
+Pclass,0.08
+Parch,0.06
+SibSp,0.05
+Embarked_C,0.02
+Embarked_S,0.01
+Embarked_Q,0.0

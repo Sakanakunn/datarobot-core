@@ -52,7 +52,6 @@ def train_read(CsvPath,score_column_name,Exclude_columns):
     ]
     ## return を dict型で生成
     train_set = dict(zip(train_keys,train_values))
-    pdb.set_trace()
     return train_set
 
 ## スコアリング用データのImport
@@ -243,21 +242,23 @@ def add_prediction_scores(trained_pipeline_dict,X_score):
         for val in TF_prob:
             predict_scores_sub.append(round(val[0],4))
         predict_scores.append(predict_scores_sub)
-    predict_label = []
-    predict_label_keys = ['Log_label', 'RF_label', 'GB_label', 'Xgb_label']
+    predict_labels = []
+    predict_labels_keys = ['Log_label', 'RF_label', 'GB_label', 'Xgb_label']
     for key in trained_pipeline_dict.keys():
         TF_labels = trained_pipeline_dict[key].predict(X_score)
         predict_labels_sub = []
-        pdb.set_trace()
         for val in TF_labels:
             predict_labels_sub.append(val)
-        predict_labels.append(predict_scores_sub)
-    predict_dict = dict(zip(predict_scores_keys,predict_scores))
-    predict_df = pd.DataFrame.from_dict(predict_dict)
-    predict_df_conc = pd.concat([X_score, predict_df], axis=1)
+        predict_labels.append(predict_labels_sub)
+    predict_score_dict = dict(zip(predict_scores_keys,predict_scores))
+    predict_score_df = pd.DataFrame.from_dict(predict_score_dict)
+    predict_label_dict = dict(zip(predict_labels_keys,predict_labels))
+    predict_label_dict = pd.DataFrame.from_dict(predict_label_dict)
+    predict_label_df = pd.DataFrame.from_dict(predict_label_dict)
+    predict_df_conc = pd.concat([X_score, predict_score_df,predict_label_df], axis=1)
     predict_df_conc.to_csv('./csvs/output.csv')
-    convert_df_to_image(predict_df_conc, './figures/08_scoreadd_table.png', True)
-    convert_df_to_image(predict_df_conc.describe(), './figures/08_scoreadd_graph.png', True)
+    convert_df_to_image(predict_df_conc, './figures/08_scoreadd_table.png',True)
+    convert_df_to_image(predict_df_conc.describe(), './figures/08_scoreadd_graph.png', False)
     return  predict_df_conc
 
 def convert_df_to_image(df,imagename,all_fl):
